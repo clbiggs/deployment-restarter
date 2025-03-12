@@ -65,14 +65,14 @@ func GetSettings() (*Settings, error) {
 }
 
 func (settings *Settings) GetAuthURL() string {
-	return fmt.Sprintf("%s/auth/realms/%s/protocol/openid-connect/auth", settings.BaseURL, url.PathEscape(settings.Realm))
+	return fmt.Sprintf("%s/realms/%s/protocol/openid-connect/auth", settings.BaseURL, url.PathEscape(settings.Realm))
 }
 
 func (settings *Settings) GetTokenURL() string {
-	return fmt.Sprintf("%s/auth/realms/%s/protocol/openid-connect/token", settings.BaseURL, url.PathEscape(settings.Realm))
+	return fmt.Sprintf("%s/realms/%s/protocol/openid-connect/token", settings.BaseURL, url.PathEscape(settings.Realm))
 }
 
-func exchangeCodeForToken(code string) (*TokenResponse, error) {
+func ExchangeCodeForToken(code string) (*TokenResponse, error) {
 	settings, err := GetSettings()
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func exchangeCodeForToken(code string) (*TokenResponse, error) {
 	return &tokenResp, nil
 }
 
-func parseIDToken(idToken string) (*KeycloakClaim, error) {
+func ParseIDToken(idToken string) (*KeycloakClaim, error) {
 	parser := new(jwt.Parser)
 	claims := &KeycloakClaim{}
 
@@ -114,7 +114,7 @@ func parseIDToken(idToken string) (*KeycloakClaim, error) {
 	return claims, nil
 }
 
-func determineRole(roles []string) string {
+func DetermineRole(roles []string) string {
 	for _, r := range ROLES {
 		if slices.Contains(roles, r) {
 			return r
@@ -124,7 +124,7 @@ func determineRole(roles []string) string {
 	return RoleUser
 }
 
-func generateState(length int) string {
+func GenerateState(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, length)
 	for i := range b {
