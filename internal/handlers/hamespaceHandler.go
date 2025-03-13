@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func GetNamespaceHandler(kubeclient *kubernetes.Clientset) http.HandlerFunc {
+func GetNamespaceHandler(kubeClient *kubernetes.Clientset) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		claims, ok := middleware.GetClaims(r.Context())
 		if !ok {
@@ -23,7 +23,7 @@ func GetNamespaceHandler(kubeclient *kubernetes.Clientset) http.HandlerFunc {
 		var err error
 		if claims.Role == auth.RoleAdmin {
 			// admins get all namespaces
-			nsList, err = kubeclient.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
+			nsList, err = kubeClient.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
 			if err != nil {
 				http.Error(w, fmt.Sprintf("Error fetching namespaces: %v", err), http.StatusInternalServerError)
 				return
@@ -32,7 +32,7 @@ func GetNamespaceHandler(kubeclient *kubernetes.Clientset) http.HandlerFunc {
 			// get namespaces with matching role label
 			labelKey := fmt.Sprintf("ngic.com/restart.%s", claims.Role)
 			labelSelector := fmt.Sprintf("%s=true", labelKey)
-			nsList, err = kubeclient.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{
+			nsList, err = kubeClient.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{
 				LabelSelector: labelSelector,
 			})
 			if err != nil {

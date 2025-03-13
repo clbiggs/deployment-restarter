@@ -51,6 +51,8 @@ func main() {
 	api := r.PathPrefix("/api").Subrouter()
 	api.Use(middleware.JWTMiddleware)
 	api.HandleFunc("/namespaces", handlers.GetNamespaceHandler(kubeClient)).Methods("GET")
+	api.HandleFunc("/namespaces/{namespace}", handlers.GetDeploymentsHandler(kubeClient)).Methods("GET")
+	api.HandleFunc("/namespaces/{namespace}/deployments/{deployment}/restart", handlers.RestartDeploymentHandler(kubeClient)).Methods("POST")
 
 	// Serve static files if needed.
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
